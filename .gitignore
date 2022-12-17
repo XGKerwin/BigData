@@ -1,3 +1,5 @@
 # Project exclude paths
 /zookeeper_api/target/
+/Hadoop_api/target/
+/MapReduce/target
 .idea
