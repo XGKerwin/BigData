@@ -1,4 +1,4 @@
-package com.example;
+package com.example.wordcount_partitioner;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
@@ -15,44 +15,49 @@ import java.net.URISyntaxException;
 
 /**
  * @author guanxin
- * @Date 2022-12-13 23:16
+ * @Date 2022-12-18 14:10
  * @Email aiykerwin@sina.com
  */
 public class JobMain {
 
-    /**
-     * 创建一个MapReducer作业  并执行
-     * 统计个数
-     */
+    private static final String INPUT = "D:\\bank\\input\\covid19";
+    private static final String OUTPUT = "D:\\bank\\output\\covid19";
+    private static final String INPUT_NODE = "hdfs://node1:8020/input/covid19";
+    private static final String OUTPUT_NODE = "hdfs://node1:8020/output/covid19";
 
-    private static final String INPUT = "D:\\bank\\input\\wordcount";
-    private static final String OUTPUT = "D:\\bank\\output\\wordcount";
-
-    private static final String INPUT_NODE = "hdfs://node1:8020/input/wordcount";
-    private static final String OUTPUT_NODE = "hdfs://node1:8020/output/wordcount";
-
-    public static void main(String[] args) throws IOException, InterruptedException, ClassNotFoundException, URISyntaxException {
-        // true 集群运行    false win本地运行
-        // 集群运行 打成jar包上传到node01
-        // hadoop jar MapReduce-1.0-SNAPSHOT.jar com.example.JobMain
-        boolean node = true;
-        //配置文件对象
+    public static void main(String[] args) throws IOException, URISyntaxException, InterruptedException, ClassNotFoundException {
+        String os = System.getProperty("os.name");
+        System.out.println(os.substring(0, 3));
+        // 配置文件对象
         Configuration configuration = new Configuration();
-        //创建作业实例  任务名
-        Job job = Job.getInstance(configuration, "wordcount");
+        // 创建作业实例
+        Job job = Job.getInstance(configuration, "covid19");
         // 设置作业驱动类
         job.setJarByClass(JobMain.class);
-        // 设置job的自定义Mapper类是哪个类
+        //  设置job的自定义Mapper类是哪个类
         job.setMapperClass(WordCountMapper.class);
-        // 设置job的Mapper的K2，V2数据类型
+
+        //  设置job的Mapper的K2，V2数据类型
         job.setMapOutputKeyClass(Text.class);
         job.setMapOutputValueClass(LongWritable.class);
+
         // 设置job的自定义reducer类是哪个类
         job.setReducerClass(WordCountReducer.class);
+
         // 设置job的Reducer的K3，V3数据类型
         job.setOutputKeyClass(Text.class);
         job.setOutputValueClass(LongWritable.class);
 
+
+        // 设置你自定义的分区类
+        job.setPartitionerClass(WordCountPartitioner2.class);
+        // 设置Reduce的个数（默认是一个） 分区个数
+        job.setNumReduceTasks(3);
+        boolean node = false;
+        if (os.startsWith("Win")) {
+        } else {
+            node = true;
+        }
         if (node) {
             System.out.println("集群运行");
             // 配置job的输入数据路径,一行行读取
@@ -83,5 +88,19 @@ public class JobMain {
             System.exit(bl ? 0 : 1);
         }
 
+//        FileOutputFormat.setOutputPath(job, new Path(OUTPUT));
+//
+//        //判断输出路径是否存在 如果存在删除
+//        FileSystem fileSystem = FileSystem.get(new URI("file:///"), configuration);
+//        //FileSystem fileSystem = FileSystem.get(new URI("hdfs://node1:8020"), configuration);
+//        boolean flag = fileSystem.exists(new Path(OUTPUT));
+//        if (flag) {
+//            fileSystem.delete(new Path(OUTPUT), true);
+//        }
+//        //提交作业并等待执行完成
+//        boolean bl = job.waitForCompletion(true);
+//        //程序退出
+//        System.exit(bl ? 0 : 1);
     }
+
 }
