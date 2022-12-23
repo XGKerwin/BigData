@@ -1,0 +1,7 @@
+﻿zhangsan,lisi
+wangwu,zhaoliu
+zhangsan,wangwu
+zhaoliu,zhaoliu
+haha,hehe,
+haha,hehe,sb
+haha,xixi

@@ -32,10 +32,10 @@ public class JobMain {
     private static final String OUTPUT_NODE = "hdfs://node1:8020/output/wordcount";
 
     public static void main(String[] args) throws IOException, InterruptedException, ClassNotFoundException, URISyntaxException {
-        // true 集群运行    false win本地运行
         // 集群运行 打成jar包上传到node01
         // hadoop jar MapReduce-1.0-SNAPSHOT.jar com.example.wordcount.JobMain
-        boolean node = true;
+        String os = System.getProperty("os.name");
+        System.out.println(os.substring(0, 3));
         //配置文件对象
         Configuration configuration = new Configuration();
         //创建作业实例  任务名
@@ -53,6 +53,11 @@ public class JobMain {
         job.setOutputKeyClass(Text.class);
         job.setOutputValueClass(LongWritable.class);
 
+        boolean node = false;
+        if (os.startsWith("Win")) {
+        } else {
+            node = true;
+        }
         if (node) {
             System.out.println("集群运行");
             // 配置job的输入数据路径,一行行读取

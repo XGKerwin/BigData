@@ -13,6 +13,7 @@ import java.util.HashMap;
 public class CovidPartitioner extends Partitioner<CovidBean, NullWritable> {
     static HashMap<String, Integer> stateMap = new HashMap<>();
     // 精准分区
+    
 //    static {
 //        stateMap.put("Alabama", 0);
 //        stateMap.put("Alaska", 1);
@@ -84,6 +85,7 @@ public class CovidPartitioner extends Partitioner<CovidBean, NullWritable> {
     @Override
     public int getPartition(CovidBean covidBean, NullWritable nullWritable, int i) {
         String state = covidBean.getState();
+        System.out.println("--------------" + i);
         if (z == -1) {
             z = 0;
             Integer put = stateMap.put(state, z);
